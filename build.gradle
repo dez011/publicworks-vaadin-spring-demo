@@ -1,0 +1,78 @@
+plugins {
+    alias(libs.plugins.version)
+    alias(libs.plugins.spring)
+    alias(libs.plugins.vaadin)
+    id 'groovy'
+}
+
+group = 'net.ofnir'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // maven {
+    //     url = "https://maven.vaadin.com/vaadin-prereleases"
+    // }
+}
+
+bootRun {
+    environment("SPRING_PROFILES_ACTIVE", "dev")
+    systemProperties = System.properties
+}
+
+bootJar {
+    dependsOn vaadinBuildFrontend
+    archiveClassifier = "fat"
+}
+
+vaadin {
+    reactEnable = false // remove for react router and components in the client
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+tasks.named('dependencyUpdates').configure {
+    gradleReleaseChannel = 'current'
+    revision = 'release'
+    rejectVersionIf {
+        it.candidate.group=="org.springframework.boot" && !it.candidate.version.startsWith("3.4") ||
+        it.candidate.group=="org.apache.groovy" && !it.candidate.version.startsWith("4.")
+    }
+}
+
+dependencies {
+    implementation platform(libs.springboot.bom)
+    implementation platform(libs.vaadin.bom)
+    implementation platform(libs.groovy.bom)
+
+    implementation "org.apache.groovy:groovy"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "com.vaadin:vaadin-spring-boot-starter", {
+        exclude group: 'com.vaadin', module: 'hilla' // remove for hilla
+        exclude group: 'com.vaadin', module: 'flow-react' // remove for react router and components in the client
+        exclude group: 'com.vaadin', module: 'vaadin-dev'
+    }
+
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    runtimeOnly "com.h2database:h2"        // in-memory dev DB, or use postgres/mysql instead
+    implementation 'org.springframework.security:spring-security-crypto'
+
+    developmentOnly platform(libs.springboot.bom)
+    developmentOnly platform(libs.vaadin.bom)
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'com.vaadin:vaadin-dev', {
+        exclude group: 'com.vaadin', module: 'hilla-dev' // remove for hilla
+        exclude group: 'com.vaadin', module: 'copilot'
+    }
+}
