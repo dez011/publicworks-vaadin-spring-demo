@@ -35,4 +35,31 @@ public final class CurrentUser {
         User u = get();
         return u != null ? u.getTenantId() : null;
     }
+
+    /** This is the only tenant helper you need here */
+    public static String getCustomerDiferentiator() {
+        if (VaadinSession.getCurrent() == null) {
+            return null;
+        }
+        User u = get();
+        return u != null ? u.getCustomerDiferentiator() : null;
+    }
+
 }
+
+/*
+public interface CurrentTenantResolver {
+    String getCurrentTenantId();
+}
+
+@Component
+public class SecurityContextTenantResolver implements CurrentTenantResolver {
+
+    @Override
+    public String getCurrentTenantId() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails principal = (MyUserDetails) auth.getPrincipal();
+        return principal.getTenantId(); // "alaska", "default", etc.
+    }
+}
+ */

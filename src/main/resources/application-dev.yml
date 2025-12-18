@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:publicworks_default;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+tenants:
+  datasources:
+    alaska:
+      url: ${ALASKA_DB_URL:jdbc:h2:mem:publicworks_alaska;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+      username: ${ALASKA_DB_USER:sa}
+      password: ${ALASKA_DB_PASS:}
